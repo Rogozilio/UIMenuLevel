@@ -28,6 +28,7 @@ public class Box
 
     public void Show()
     {
+        GUILayout.Space(10f);
         GUILayout.BeginVertical(_name, "window", GUILayout.Width(300f), GUILayout.Height(_height));
         Actions?.Invoke();
         _rect = GUILayoutUtility.GetLastRect();

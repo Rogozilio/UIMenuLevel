@@ -11,33 +11,23 @@ using Image = UnityEngine.UI.Image;
 public class MainMenu : EditorWindow
 {
     private List<Box> _listBoxs;
+    private List<DataMenuLevel> _dbMenuLevels;
+    private DataMenuLevel _valueMenuLevel;
+    private PreviewBox _previewBox;
 
-    private string _name = "";
-    private string _description = "";
-    private string _textButtonStartlevel;
+    private Vector2 _scrollPos;
 
-    private Sprite _logo;
-    private Sprite _imageAboveName;
-    private Sprite _imageUp;
-    private Sprite _imageLeft;
-    private Sprite _imageRight;
-    private Sprite _imageBackground;
+    private string _nameUI = "";
 
-    private Color _colorStartButton;
-    private Color _colorBackground;
-
+    private Box _boxPreviewMenu;
+    private Box _boxMenuLevel;
     private Box _boxTexts;
     private Box _boxImages;
     private Box _boxSettings;
 
-    private Font _fontName;
-    private Font _fontDes;
-    private Font _fontStartBtn;
-
-    private int _sizeFontName = 14;
-    private int _sizeFontDes = 14;
-    private int _sizeFontStartBtn = 14;
-    private float _alphaBackground = 1f;
+    private int _numberActionMenuLevel = 0;
+    private int _widthWindow;
+    private int _heightWindow = 800;
 
     [MenuItem("Window/MainMenu")]
     public static MainMenu OpenMainMenuEdit()
@@ -47,7 +37,13 @@ public class MainMenu : EditorWindow
 
     private void OnEnable()
     {
+        _dbMenuLevels = new List<DataMenuLevel>();
+
         _listBoxs = new List<Box>();
+        _boxPreviewMenu = new Box("Предварительный просмотр меню");
+        _listBoxs.Add(_boxPreviewMenu);
+        _boxMenuLevel = new Box("Выбор меню уровня");
+        _listBoxs.Add(_boxMenuLevel);
         _boxTexts = new Box("Настройка текста");
         _listBoxs.Add(_boxTexts);
         _boxImages = new Box("Настройка изображений");
@@ -55,13 +51,25 @@ public class MainMenu : EditorWindow
         _boxSettings = new Box("Общие настройки");
         _listBoxs.Add(_boxSettings);
 
+        _boxPreviewMenu.Actions += BoxPreviewMenu;
+        _boxMenuLevel.Actions += BoxMenuLevel;
         _boxTexts.Actions += BoxTexts;
         _boxImages.Actions += BoxImages;
         _boxSettings.Actions += BoxSettings;
+
+        LoadDBMenuLevels();
+        if (_dbMenuLevels.Count > 0)
+        {
+            _numberActionMenuLevel = 0;
+        }
+
+        _previewBox = new PreviewBox();
     }
 
     private void OnDisable()
     {
+        _boxPreviewMenu.Actions -= BoxPreviewMenu;
+        _boxMenuLevel.Actions -= BoxMenuLevel;
         _boxTexts.Actions -= BoxTexts;
         _boxImages.Actions -= BoxImages;
         _boxSettings.Actions -= BoxSettings;
@@ -69,7 +77,26 @@ public class MainMenu : EditorWindow
 
     private void OnGUI()
     {
+        AutoAspectWindow();
+        if (_dbMenuLevels.Count > 0)
+        {
+            _valueMenuLevel = _dbMenuLevels[_numberActionMenuLevel];
+        }
+
         Show();
+        if (_dbMenuLevels.Count > 0)
+        {
+            _dbMenuLevels[_numberActionMenuLevel] = _valueMenuLevel;
+            _previewBox.MenuLevel = _valueMenuLevel;
+        }
+    }
+
+    private void AutoAspectWindow()
+    {
+        _heightWindow = Screen.height;
+        _widthWindow = (int) (_heightWindow * 1.7777778f) + 315;
+        minSize = new Vector2(_widthWindow, 500f);
+        maxSize = new Vector2(_widthWindow, 700f);
     }
 
     private void AutoHeightBoxOnLastRect(Box box)
@@ -85,47 +112,188 @@ public class MainMenu : EditorWindow
         }
     }
 
+    public void BoxPreviewMenu()
+    {
+        GUILayout.BeginHorizontal();
+        GUILayout.Space(10f);
+        if (GUILayout.Button("Главное окно"))
+        {
+            _previewBox.IsMainWindow = true;
+        }
+
+        if (GUILayout.Button("Подробное описание"))
+        {
+            _previewBox.IsMainWindow = false;
+        }
+
+        GUILayout.Space(10f);
+        GUILayout.EndHorizontal();
+
+        AutoHeightBoxOnLastRect(_boxPreviewMenu);
+
+        GUILayout.Space(10f);
+    }
+
+    private void BoxMenuLevel()
+    {
+        GUILayout.Space(10f);
+
+        GUILayout.BeginHorizontal();
+        GUILayout.Space(10f);
+        _nameUI = GUILayout.TextField(_nameUI, GUILayout.Width(120f));
+        GUILayout.Space(10f);
+        if (GUILayout.Button("Добавить UI"))
+        {
+            if (_nameUI != "")
+            {
+                DataMenuLevel newDataMenuLevel = new DataMenuLevel();
+                newDataMenuLevel.name = _nameUI;
+                newDataMenuLevel.alpha = 1f;
+                _dbMenuLevels.Add(newDataMenuLevel);
+                _valueMenuLevel = _dbMenuLevels[_numberActionMenuLevel];
+            }
+        }
+
+        GUILayout.Space(10f);
+        GUILayout.EndHorizontal();
+        GUILayout.Space(10f);
+
+        for (int i = 0; i < _dbMenuLevels.Count; i++)
+        {
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(10f);
+            GUILayout.Label(_dbMenuLevels[i].name, GUILayout.Width(120f));
+            GUILayout.Space(10f);
+            if (GUILayout.Button("x", GUILayout.Width(30f)))
+            {
+                _dbMenuLevels.RemoveAt(i);
+            }
+
+            GUILayout.Space(10f);
+            if (_numberActionMenuLevel != i)
+            {
+                if (GUILayout.Button("Выбрать"))
+                {
+                    _numberActionMenuLevel = i;
+                    _valueMenuLevel = _dbMenuLevels[_numberActionMenuLevel];
+                }
+            }
+
+            GUILayout.Space(10f);
+            GUILayout.EndHorizontal();
+        }
+
+        AutoHeightBoxOnLastRect(_boxMenuLevel);
+
+        GUILayout.Space(10f);
+    }
+
     private void BoxTexts()
     {
         GUILayout.Space(10f);
-        GUILayout.Label("Название миссии:");
-        _name = GUILayout.TextField(_name, GUILayout.MinWidth(120f));
-
         GUILayout.BeginHorizontal();
-        GUILayout.Label("Шрифт:");
-        _fontName = (Font) EditorGUILayout
-            .ObjectField(_fontName, typeof(Font), false, GUILayout.Width(110f));
-        GUILayout.Label("Размер:");
-        _sizeFontName = EditorGUILayout.IntField(_sizeFontName);
+        GUILayout.Space(10f);
+        GUILayout.Label("Название миссии:");
+        GUILayout.Space(10f);
         GUILayout.EndHorizontal();
 
+        GUILayout.BeginHorizontal();
+        GUILayout.Space(10f);
+        _valueMenuLevel.name = GUILayout.TextField(_valueMenuLevel.name, GUILayout.MinWidth(120f));
+        GUILayout.Space(10f);
+        GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal();
+        GUILayout.Space(10f);
+        GUILayout.Label("Шрифт:");
+        _valueMenuLevel.fontName = (Font) EditorGUILayout
+            .ObjectField(_valueMenuLevel.fontName, typeof(Font), false, GUILayout.Width(110f));
+        GUILayout.Label("Размер:");
+        _valueMenuLevel.sizeFontName = EditorGUILayout.IntField(_valueMenuLevel.sizeFontName);
+        GUILayout.Space(10f);
+        GUILayout.EndHorizontal();
+
+        GUILayout.Space(10f);
+
+        GUILayout.BeginHorizontal();
         GUILayout.Space(10f);
         GUILayout.Label("Описание:");
-        _description = GUILayout.TextArea(_description);
+        GUILayout.Space(10f);
+        GUILayout.EndHorizontal();
 
         GUILayout.BeginHorizontal();
+        GUILayout.Space(10f);
+        _valueMenuLevel.description = GUILayout.TextArea(_valueMenuLevel.description);
+        GUILayout.Space(10f);
+        GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal();
+        GUILayout.Space(10f);
         GUILayout.Label("Шрифт:");
-        _fontDes = (Font) EditorGUILayout
-            .ObjectField(_fontDes, typeof(Font), false, GUILayout.Width(110f));
+        _valueMenuLevel.fontDes = (Font) EditorGUILayout
+            .ObjectField(_valueMenuLevel.fontDes, typeof(Font), false, GUILayout.Width(110f));
         GUILayout.Label("Размер:");
-        _sizeFontDes = EditorGUILayout.IntField(_sizeFontDes);
+        _valueMenuLevel.sizeFontDes = EditorGUILayout.IntField(_valueMenuLevel.sizeFontDes);
+        GUILayout.Space(10f);
         GUILayout.EndHorizontal();
 
         GUILayout.Space(10f);
         GUILayout.BeginHorizontal();
+        GUILayout.Space(10f);
         GUILayout.Label("Текст кнопки запуска миссии:");
-        _colorStartButton = EditorGUILayout.ColorField(_colorStartButton);
+        _valueMenuLevel.colorStartButton =
+            EditorGUILayout.ColorField(_valueMenuLevel.colorStartButton);
+        GUILayout.Space(10f);
         GUILayout.EndHorizontal();
-        _textButtonStartlevel =
-            GUILayout.TextField(_textButtonStartlevel, GUILayout.MinWidth(120f));
 
         GUILayout.BeginHorizontal();
-        GUILayout.Label("Шрифт:");
-        _fontStartBtn = (Font) EditorGUILayout
-            .ObjectField(_fontStartBtn, typeof(Font), false, GUILayout.Width(110f));
-        GUILayout.Label("Размер:");
-        _sizeFontStartBtn = EditorGUILayout.IntField(_sizeFontStartBtn);
+        GUILayout.Space(10f);
+        _valueMenuLevel.textButtonStartLevel =
+            GUILayout.TextField(_valueMenuLevel.textButtonStartLevel, GUILayout.MinWidth(120f));
+        GUILayout.Space(10f);
         GUILayout.EndHorizontal();
+
+        GUILayout.BeginHorizontal();
+        GUILayout.Space(10f);
+        GUILayout.Label("Шрифт:");
+        _valueMenuLevel.fontStartBtn = (Font) EditorGUILayout
+            .ObjectField(_valueMenuLevel.fontStartBtn, typeof(Font), false, GUILayout.Width(110f));
+        GUILayout.Label("Размер:");
+        _valueMenuLevel.sizeFontStartBtn =
+            EditorGUILayout.IntField(_valueMenuLevel.sizeFontStartBtn);
+        GUILayout.Space(10f);
+        GUILayout.EndHorizontal();
+        GUILayout.Space(10f);
+        GUILayout.BeginHorizontal();
+        GUILayout.Space(10f);
+        _valueMenuLevel.isUseBigDescription
+            = GUILayout.Toggle(_valueMenuLevel.isUseBigDescription,
+                "Использовать подробное описание");
+        GUILayout.Space(10f);
+        GUILayout.EndHorizontal();
+        GUILayout.Space(5f);
+
+        if (_valueMenuLevel.isUseBigDescription)
+        {
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(10f);
+            _valueMenuLevel.bigDescription
+                = GUILayout.TextArea(_valueMenuLevel.bigDescription);
+            GUILayout.Space(10f);
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
+            GUILayout.Space(10f);
+            GUILayout.Label("Шрифт:");
+            _valueMenuLevel.fontBigDes = (Font) EditorGUILayout
+                .ObjectField(_valueMenuLevel.fontBigDes, typeof(Font), false,
+                    GUILayout.Width(110f));
+            GUILayout.Label("Размер:");
+            _valueMenuLevel.sizeFontBigDes =
+                EditorGUILayout.IntField(_valueMenuLevel.sizeFontBigDes);
+            GUILayout.Space(10f);
+            GUILayout.EndHorizontal();
+        }
+
         AutoHeightBoxOnLastRect(_boxTexts);
 
         GUILayout.Space(10f);
@@ -137,18 +305,18 @@ public class MainMenu : EditorWindow
         GUILayout.BeginHorizontal();
         GUILayout.BeginVertical();
 
-        //GUILayout.Label("Логотип");
         GUILayout.BeginHorizontal();
         GUILayout.Space(10f);
-        _logo = (Sprite) EditorGUILayout.ObjectField(_logo, typeof(Sprite), false,
+        _valueMenuLevel.logo = (Sprite) EditorGUILayout.ObjectField(_valueMenuLevel.logo,
+            typeof(Sprite), false,
             GUILayout.Height(80f), GUILayout.Width(80f));
         GUILayout.EndHorizontal();
         GUILayout.Space(10f);
-        //GUILayout.Label("Изображение над названием");
         GUILayout.BeginHorizontal();
         GUILayout.Space(10f);
-        _imageAboveName =
-            (Sprite) EditorGUILayout.ObjectField(_imageAboveName, typeof(Sprite), false,
+        _valueMenuLevel.imageAboveName =
+            (Sprite) EditorGUILayout.ObjectField(_valueMenuLevel.imageAboveName, typeof(Sprite),
+                false,
                 GUILayout.Height(80f), GUILayout.Width(80f));
         GUILayout.EndHorizontal();
 
@@ -158,21 +326,20 @@ public class MainMenu : EditorWindow
 
         GUILayout.BeginHorizontal();
         GUILayout.Space(10f);
-        //GUILayout.Label("Изображение сверху");
-        _imageUp = (Sprite) EditorGUILayout.ObjectField(_imageUp, typeof(Sprite), false,
+        _valueMenuLevel.imageUp = (Sprite) EditorGUILayout.ObjectField(_valueMenuLevel.imageUp,
+            typeof(Sprite), false,
             GUILayout.Height(80f), GUILayout.ExpandWidth(true));
         GUILayout.Space(10f);
         GUILayout.EndHorizontal();
         GUILayout.Space(10f);
         GUILayout.BeginHorizontal();
-        //GUILayout.Label("Изображение слева");
         GUILayout.Space(10f);
-        _imageLeft = (Sprite) EditorGUILayout.ObjectField(_imageLeft, typeof(Sprite), false,
+        _valueMenuLevel.imageLeft = (Sprite) EditorGUILayout.ObjectField(_valueMenuLevel.imageLeft,
+            typeof(Sprite), false,
             GUILayout.Height(80f), GUILayout.ExpandWidth(true));
         GUILayout.Space(10f);
-        //GUILayout.Label("Изображение справа");
-        _imageRight =
-            (Sprite) EditorGUILayout.ObjectField(_imageRight, typeof(Sprite), false,
+        _valueMenuLevel.imageRight =
+            (Sprite) EditorGUILayout.ObjectField(_valueMenuLevel.imageRight, typeof(Sprite), false,
                 GUILayout.Height(80f), GUILayout.ExpandWidth(true));
         GUILayout.Space(10f);
         GUILayout.EndHorizontal();
@@ -188,18 +355,30 @@ public class MainMenu : EditorWindow
         GUILayout.Space(10f);
 
         GUILayout.BeginHorizontal();
+        GUILayout.Space(10f);
         GUILayout.Label("Цвет заднего фона");
-        _colorBackground = EditorGUILayout.ColorField(_colorBackground);
+        _valueMenuLevel.colorBackground =
+            EditorGUILayout.ColorField(_valueMenuLevel.colorBackground);
+        GUILayout.Space(10f);
         GUILayout.EndHorizontal();
+
         GUILayout.BeginHorizontal();
+        GUILayout.Space(10f);
         GUILayout.Label("Изображение заднего фона");
-        _imageBackground =
-            (Sprite) EditorGUILayout.ObjectField(_imageBackground, typeof(Sprite), false);
+        _valueMenuLevel.imageBackground =
+            (Sprite) EditorGUILayout.ObjectField(_valueMenuLevel.imageBackground, typeof(Sprite),
+                false);
+        GUILayout.Space(10f);
         GUILayout.EndHorizontal();
+
         GUILayout.BeginHorizontal();
+        GUILayout.Space(10f);
         GUILayout.Label("Прозрачность виджета");
-        _alphaBackground = EditorGUILayout.Slider(_alphaBackground, 0, 1);
+        _valueMenuLevel.alpha =
+            EditorGUILayout.Slider(_valueMenuLevel.alpha, 0, 1);
+        GUILayout.Space(10f);
         GUILayout.EndHorizontal();
+
         AutoHeightBoxOnLastRect(_boxSettings);
 
         GUILayout.Space(10f);
@@ -207,83 +386,27 @@ public class MainMenu : EditorWindow
 
     private void Show()
     {
+        _scrollPos = GUILayout.BeginScrollView(_scrollPos
+            , GUILayout.Width(315f), GUILayout.Height(Screen.height - 20f));
+        _boxPreviewMenu.Show();
+        _boxMenuLevel.Show();
         _boxTexts.Show();
         _boxImages.Show();
         _boxSettings.Show();
-
-        if (GUILayout.Button("Создать"))
-        {
-            CreateMenuLevel();
-        }
+        GUILayout.EndScrollView();
+        _previewBox.Show();
     }
 
-    private void CreateMenuLevel()
+    private void LoadDBMenuLevels()
     {
-        GameObject menuLevel = null;
-        string[] assetNames = AssetDatabase.FindAssets("", new[] {"Assets/Prefabs/Menu"});
+        DBMenuLevels DBMenuLevels;
+        string[] assetNames = AssetDatabase.FindAssets("", new[] {"Assets/Scripts/DBMenuLevels"});
         foreach (string SOName in assetNames)
         {
             var SOpath = AssetDatabase.GUIDToAssetPath(SOName);
-            menuLevel = AssetDatabase.LoadAssetAtPath<GameObject>(SOpath);
-            if (menuLevel.name == "MenuLevel")
-                break;
+            DBMenuLevels = (DBMenuLevels) AssetDatabase.LoadAssetAtPath<ScriptableObject>(SOpath);
+            if (DBMenuLevels != null && DBMenuLevels.MenuLevels != null)
+                _dbMenuLevels = DBMenuLevels.MenuLevels;
         }
-
-        foreach (var component in menuLevel.GetComponentsInChildren<Text>())
-        {
-            switch (component.name)
-            {
-                case "Name":
-                    component.text = _name;
-                    component.font = _fontName;
-                    component.fontSize = _sizeFontName;
-                    break;
-                case "Description":
-                    component.text = _description;
-                    component.font = _fontDes;
-                    component.fontSize = _sizeFontDes;
-                    break;
-                case "TextStart":
-                    component.text = _textButtonStartlevel;
-                    component.font = _fontStartBtn;
-                    component.fontSize = _sizeFontStartBtn;
-                    break;
-            }
-        }
-
-        foreach (var component in menuLevel.GetComponentsInChildren<Image>())
-        {
-            switch (component.name)
-            {
-                case "Logo":
-                    component.sprite = _logo;
-                    break;
-                case "ImageName":
-                    component.sprite = _imageAboveName;
-                    break;
-                case "ImageUp":
-                    component.sprite = _imageUp;
-                    break;
-                case "ImageLeft":
-                    component.sprite = _imageLeft;
-                    break;
-                case "ImageRight":
-                    component.sprite = _imageRight;
-                    break;
-                case "Start":
-                    component.color = _colorStartButton;
-                    break;
-                case "Background":
-                    component.sprite = _imageBackground;
-                    component.color = _colorBackground;
-                    break;
-            }
-        }
-
-        GameObject menuLevelHow = Instantiate(menuLevel);
-        menuLevelHow.name = "MenuLevel";
-        
-        // 1 - Прозрачность всего виджета?
-        // 2 - По поводу следующего окна
     }
 }
