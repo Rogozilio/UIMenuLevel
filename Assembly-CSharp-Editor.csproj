@@ -55,6 +55,7 @@
      <Compile Include="Assets\Editor\PreviewBox.cs" />
      <Compile Include="Assets\Editor\MainMenu.cs" />
      <Compile Include="Assets\Editor\Box.cs" />
+     <Compile Include="Assets\Editor\DBMenuLevelsEditor.cs" />
  <Reference Include="UnityEngine">
  <HintPath>C:/Program Files/Unity/Hub/Editor/2020.3.19f1/Editor/Data/Managed/UnityEngine/UnityEngine.dll</HintPath>
  </Reference>

@@ -15,28 +15,28 @@ D:/unity/UIMainMenu
 -logFile
 Logs/AssetImportWorker35.log
 -srvPort
-62151
+50901
 Successfully changed project path to: D:/unity/UIMainMenu
 D:/unity/UIMainMenu
 Using Asset Import Pipeline V2.
 received signal from system: SIGSEGV
 Stack trace:
-0x00007ff6139478dc (Unity) StackWalker::GetCurrentCallstack
-0x00007ff61394ff79 (Unity) StackWalker::ShowCallstack
-0x00007ff614e73ddc (Unity) GetStacktrace
-0x00007ff613946f44 (Unity) winutils::CrashHandler::DefaultSignalHandler
-0x00007ff616d2be72 (Unity) seh_filter_exe
-0x00007ff6171007a9 (Unity) `__scrt_common_main_seh'::`1'::filt$0
-0x00007ff616cf9a58 (Unity) _C_specific_handler
+0x00007ff78d3178dc (Unity) StackWalker::GetCurrentCallstack
+0x00007ff78d31ff79 (Unity) StackWalker::ShowCallstack
+0x00007ff78e843ddc (Unity) GetStacktrace
+0x00007ff78d316f44 (Unity) winutils::CrashHandler::DefaultSignalHandler
+0x00007ff7906fbe72 (Unity) seh_filter_exe
+0x00007ff790ad07a9 (Unity) `__scrt_common_main_seh'::`1'::filt$0
+0x00007ff7906c9a58 (Unity) _C_specific_handler
 0x00007ff831ed20cf (ntdll) _chkstk
 0x00007ff831e81454 (ntdll) RtlRaiseException
 0x00007ff831ed0bfe (ntdll) KiUserExceptionDispatcher
-0x00007ff61501b5ed (Unity) SyncAssetFoldersWithDB
-0x00007ff615002119 (Unity) InitializeAssetDatabaseV2
-0x00007ff614f53ca5 (Unity) AssetDatabase::InitializeAssetDatabase
-0x00007ff6144d43b0 (Unity) Application::InitializeProject
-0x00007ff614e81342 (Unity) WinMain
-0x00007ff616cd69b6 (Unity) __scrt_common_main_seh
+0x00007ff78e9eb5ed (Unity) SyncAssetFoldersWithDB
+0x00007ff78e9d2119 (Unity) InitializeAssetDatabaseV2
+0x00007ff78e923ca5 (Unity) AssetDatabase::InitializeAssetDatabase
+0x00007ff78dea43b0 (Unity) Application::InitializeProject
+0x00007ff78e851342 (Unity) WinMain
+0x00007ff7906a69b6 (Unity) __scrt_common_main_seh
 0x00007ff831827034 (KERNEL32) BaseThreadInitThunk
 0x00007ff831e82651 (ntdll) RtlUserThreadStart
 
