@@ -10,62 +10,61 @@ using UnityEngine.UI;
 public class PreviewBox
 {
     private DataMenuLevel _menuLevel;
-
-    private GUIStyle _styleName = new GUIStyle();
-    private GUIStyle _styleDescription = new GUIStyle();
-    private GUIStyle _styleStartButton = new GUIStyle();
-    private GUIStyle _styleBigDescription = new GUIStyle();
-
+    private GUIStyle _style;
     private Material _material;
 
+    private bool _isUseBigDescription;
     private bool _isMainWindow;
+
+    private float _ratioFontAndScreen;
 
     public bool IsMainWindow
     {
         set => _isMainWindow = value;
     }
+    public bool IsUseBigDescription
+    {
+        set => _isUseBigDescription = value;
+    }
 
     public DataMenuLevel MenuLevel
     {
-        get => _menuLevel;
         set => _menuLevel = value;
     }
 
     public PreviewBox()
     {
         _isMainWindow = true;
-        Material material;
-        string[] assetNames = AssetDatabase.FindAssets("", new[] {"Assets/Materials"});
-        foreach (string SOName in assetNames)
-        {
-            var SOpath = AssetDatabase.GUIDToAssetPath(SOName);
-            material = AssetDatabase.LoadAssetAtPath<Material>(SOpath);
-            if (material != null)
-                _material = material;
-        }
+        _style = new GUIStyle();
+        
+        _material = new Material(Shader.Find("Sprites/Default"));
+        _material.color = Color.white;
     }
 
     public void Show()
     {
+        _ratioFontAndScreen = Screen.height / 634f;
         DrawImageBackground();
+        DrawColorStartButton();
         if (_isMainWindow)
         {
-            
-
             DrawImageAboveName();
             DrawImageUp();
             DrawImageLeft();
             DrawImageRight();
-            DrawColorStartButton();
-            
 
             DrawTextName();
             DrawTextDescription();
-            
+            if (_isUseBigDescription)
+            {
+                DrawButtonMoreInfo();
+            }
         }
         else
         {
             DrawTextBigDescription();
+            DrawColorBackButton();
+            DrawTextBackButton();
         }
         DrawImageLogo();
         DrawTextStartButton();
@@ -166,6 +165,17 @@ public class PreviewBox
 
         EditorGUI.DrawPreviewTexture(rect, Texture2D.whiteTexture, material);
     }
+    private void DrawColorBackButton()
+    {
+        Rect rect = new Rect(315 + GetSizeWidth(1f), 10 + GetSizeHeight(28f)
+            , GetSizeWidth(27f), GetSizeHeight(5f));
+        Material material = new Material(_material);
+        Color color = _menuLevel.colorStartButton;
+        color.a = _menuLevel.alpha * _menuLevel.colorStartButton.a;
+        material.color = color;
+
+        EditorGUI.DrawPreviewTexture(rect, Texture2D.whiteTexture, material);
+    }
 
     private void DrawImageBackground()
     {
@@ -191,11 +201,12 @@ public class PreviewBox
         Color color = Color.white;
         color.a = _menuLevel.alpha;
 
-        _styleName.font = _menuLevel.fontName;
-        _styleName.fontSize = _menuLevel.sizeFontName;
-        _styleName.normal.textColor = color;
+        _style.font = _menuLevel.fontName;
+        _style.fontSize = (int)(_menuLevel.sizeFontName * _ratioFontAndScreen);
+        _style.alignment = TextAnchor.MiddleLeft;
+        _style.normal.textColor = color;
 
-        EditorGUI.LabelField(rect, _menuLevel.name, _styleName);
+        EditorGUI.LabelField(rect, _menuLevel.name, _style);
     }
 
     private void DrawTextDescription()
@@ -205,12 +216,12 @@ public class PreviewBox
         Color color = Color.white;
         color.a = _menuLevel.alpha;
 
-        _styleDescription.font = _menuLevel.fontDes;
-        _styleDescription.fontSize = _menuLevel.sizeFontDes;
-        _styleDescription.alignment = TextAnchor.UpperLeft;
-        _styleDescription.normal.textColor = color;
+        _style.font = _menuLevel.fontDes;
+        _style.fontSize = (int)(_menuLevel.sizeFontDes * _ratioFontAndScreen);
+        _style.alignment = TextAnchor.UpperLeft;
+        _style.normal.textColor = color;
 
-        EditorGUI.LabelField(rect, _menuLevel.description, _styleDescription);
+        EditorGUI.LabelField(rect, _menuLevel.description, _style);
     }
 
     private void DrawTextStartButton()
@@ -220,12 +231,26 @@ public class PreviewBox
         Color color = Color.white;
         color.a = _menuLevel.alpha;
 
-        _styleStartButton.font = _menuLevel.fontStartBtn;
-        _styleStartButton.fontSize = _menuLevel.sizeFontStartBtn;
-        _styleStartButton.alignment = TextAnchor.MiddleCenter;
-        _styleStartButton.normal.textColor = color;
+        _style.font = _menuLevel.fontStartBtn;
+        _style.fontSize = (int)(_menuLevel.sizeFontStartBtn* _ratioFontAndScreen);
+        _style.alignment = TextAnchor.MiddleCenter;
+        _style.normal.textColor = color;
 
-        EditorGUI.LabelField(rect, _menuLevel.textButtonStartLevel, _styleStartButton);
+        EditorGUI.LabelField(rect, _menuLevel.textButtonStartLevel, _style);
+    }
+    private void DrawTextBackButton()
+    {
+        Rect rect = new Rect(315 + GetSizeWidth(1f), 10 + GetSizeHeight(28f)
+            , GetSizeWidth(27f), GetSizeHeight(5f));
+        Color color = Color.white;
+        color.a = _menuLevel.alpha;
+
+        _style.font = _menuLevel.fontStartBtn;
+        _style.fontSize = (int)(_menuLevel.sizeFontStartBtn* _ratioFontAndScreen);
+        _style.alignment = TextAnchor.MiddleCenter;
+        _style.normal.textColor = color;
+
+        EditorGUI.LabelField(rect, "Назад", _style);
     }
 
     private void DrawTextBigDescription()
@@ -235,11 +260,33 @@ public class PreviewBox
         Color color = Color.white;
         color.a = _menuLevel.alpha;
 
-        _styleBigDescription.font = _menuLevel.fontBigDes;
-        _styleBigDescription.fontSize = _menuLevel.sizeFontBigDes;
-        _styleBigDescription.alignment = TextAnchor.UpperLeft;
-        _styleBigDescription.normal.textColor = color;
+        _style.font = _menuLevel.fontBigDes;
+        _style.fontSize = (int)(_menuLevel.sizeFontBigDes * _ratioFontAndScreen);
+        _style.alignment = TextAnchor.UpperLeft;
+        _style.normal.textColor = color;
 
-        EditorGUI.LabelField(rect, _menuLevel.bigDescription, _styleBigDescription);
+        EditorGUI.LabelField(rect, _menuLevel.bigDescription, _style);
+    }
+
+    private void DrawButtonMoreInfo()
+    {
+        Rect rect = new Rect(315 + GetSizeWidth(19f), 10 + GetSizeHeight(18f)
+            , GetSizeWidth(9f), GetSizeHeight(3f));
+        Material material = new Material(_material);
+        Color color = _menuLevel.colorStartButton;
+        color.a = _menuLevel.alpha * _menuLevel.colorStartButton.a;
+        material.color = color;
+
+        EditorGUI.DrawPreviewTexture(rect, Texture2D.whiteTexture, material);
+        
+        Color colorText = Color.white;
+        colorText.a = _menuLevel.alpha;
+
+        _style.font = _menuLevel.fontStartBtn;
+        _style.fontSize = 20;
+        _style.alignment = TextAnchor.MiddleCenter;
+        _style.normal.textColor = colorText;
+
+        EditorGUI.LabelField(rect, "Подробнее", _style);
     }
 }

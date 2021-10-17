@@ -25,7 +25,7 @@ public class MainMenu : EditorWindow
     private Box _boxImages;
     private Box _boxSettings;
 
-    private int _numberActionMenuLevel = 0;
+    private int _numberActionMenuLevel;
     private int _widthWindow;
     private int _heightWindow = 800;
 
@@ -88,15 +88,17 @@ public class MainMenu : EditorWindow
         {
             _dbMenuLevels[_numberActionMenuLevel] = _valueMenuLevel;
             _previewBox.MenuLevel = _valueMenuLevel;
+            _previewBox.IsUseBigDescription = _valueMenuLevel.isUseBigDescription;
         }
     }
 
     private void AutoAspectWindow()
     {
         _heightWindow = Screen.height;
-        _widthWindow = (int) (_heightWindow * 1.7777778f) + 315;
+        _widthWindow = (int) (_heightWindow * 1.618296f) + 315;
         minSize = new Vector2(_widthWindow, 500f);
-        maxSize = new Vector2(_widthWindow, 700f);
+        maxSize = new Vector2(_widthWindow, 634f);
+        
     }
 
     private void AutoHeightBoxOnLastRect(Box box)
@@ -146,9 +148,26 @@ public class MainMenu : EditorWindow
         {
             if (_nameUI != "")
             {
+                Font defaultFont = Resources.GetBuiltinResource<Font>("Arial.ttf");
+                int defaultSizeFont = 14;
+                
                 DataMenuLevel newDataMenuLevel = new DataMenuLevel();
                 newDataMenuLevel.name = _nameUI;
+                
+                newDataMenuLevel.sizeFontName = defaultSizeFont;
+                newDataMenuLevel.sizeFontDes = defaultSizeFont;
+                newDataMenuLevel.sizeFontBigDes = defaultSizeFont;
+                newDataMenuLevel.sizeFontStartBtn = defaultSizeFont;
+                
+                newDataMenuLevel.fontName = defaultFont;
+                newDataMenuLevel.fontDes = defaultFont;
+                newDataMenuLevel.fontBigDes = defaultFont;
+                newDataMenuLevel.fontStartBtn = defaultFont;
+                
+                newDataMenuLevel.colorBackground = Color.black;
+                newDataMenuLevel.colorStartButton = Color.black;
                 newDataMenuLevel.alpha = 1f;
+                
                 _dbMenuLevels.Add(newDataMenuLevel);
                 _valueMenuLevel = _dbMenuLevels[_numberActionMenuLevel];
             }
@@ -263,7 +282,9 @@ public class MainMenu : EditorWindow
             EditorGUILayout.IntField(_valueMenuLevel.sizeFontStartBtn);
         GUILayout.Space(10f);
         GUILayout.EndHorizontal();
+        
         GUILayout.Space(10f);
+        
         GUILayout.BeginHorizontal();
         GUILayout.Space(10f);
         _valueMenuLevel.isUseBigDescription
@@ -400,7 +421,7 @@ public class MainMenu : EditorWindow
     private void LoadDBMenuLevels()
     {
         DBMenuLevels DBMenuLevels;
-        string[] assetNames = AssetDatabase.FindAssets("", new[] {"Assets/Scripts/DBMenuLevels"});
+        string[] assetNames = AssetDatabase.FindAssets("", new[] {"Assets/UI"});
         foreach (string SOName in assetNames)
         {
             var SOpath = AssetDatabase.GUIDToAssetPath(SOName);

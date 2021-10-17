@@ -56,7 +56,10 @@ public class DBMenuLevels : ScriptableObject
                 break;
         }
 
-        foreach (var component in canvasMenuLevel.GetComponentsInChildren<Image>())
+        GameObject menuLevelNow = Instantiate(canvasMenuLevel);
+        menuLevelNow.name = "MenuLevel";
+
+        foreach (var component in menuLevelNow.GetComponentsInChildren<Image>())
         {
             Color color = component.color;
             color.a = menuLevel.alpha;
@@ -82,8 +85,19 @@ public class DBMenuLevels : ScriptableObject
                     component.sprite = menuLevel.imageRight;
                     component.color = color;
                     break;
-                case "Start":
-                    component.color = menuLevel.colorStartButton;
+                case "ButtonStart":
+                    color = menuLevel.colorStartButton;
+                    color.a = menuLevel.alpha;
+                    component.color = color;
+                    break;
+                case "ButtonBack":
+                    color = menuLevel.colorStartButton;
+                    color.a = menuLevel.alpha;
+                    component.color = color;
+                    break;
+                case "ButtonNextInfo":
+                    color = menuLevel.colorStartButton;
+                    color.a = menuLevel.alpha;
                     component.color = color;
                     break;
                 case "Background":
@@ -95,9 +109,8 @@ public class DBMenuLevels : ScriptableObject
             }
         }
 
-        foreach (var component in canvasMenuLevel.GetComponentsInChildren<Text>())
+        foreach (var component in menuLevelNow.GetComponentsInChildren<Text>())
         {
-            Debug.Log(component.name);
             Color color = Color.white;
             color.a = menuLevel.alpha;
             switch (component.name)
@@ -106,6 +119,7 @@ public class DBMenuLevels : ScriptableObject
                     component.text = menuLevel.name;
                     component.font = menuLevel.fontName;
                     component.fontSize = menuLevel.sizeFontName;
+                    component.alignment = TextAnchor.MiddleLeft;
                     component.color = color;
                     break;
                 case "Description":
@@ -120,6 +134,12 @@ public class DBMenuLevels : ScriptableObject
                     component.fontSize = menuLevel.sizeFontStartBtn;
                     component.color = color;
                     break;
+                case "TextBack":
+                    component.font = menuLevel.fontStartBtn;
+                    component.fontSize = menuLevel.sizeFontStartBtn;
+                    component.color = color;
+                    component.transform.parent.gameObject.SetActive(false);
+                    break;
                 case "MoreInfo":
                     component.text = menuLevel.bigDescription;
                     component.font = menuLevel.fontBigDes;
@@ -127,15 +147,16 @@ public class DBMenuLevels : ScriptableObject
                     component.color = color;
                     component.gameObject.SetActive(false);
                     break;
+                case "TextMoreInfo":
+                    component.font = menuLevel.fontStartBtn;
+                    component.color = color;
+                    component.gameObject.transform.parent.gameObject.SetActive(false);
+                    break;
             }
         }
 
-
-        canvasMenuLevel.GetComponentInChildren<EventMenuLevel>()
+        menuLevelNow.GetComponentInChildren<EventMenuLevel>()
             .isButtonNextinfoActive = menuLevel.isUseBigDescription;
-
-        GameObject menuLevelHow = Instantiate(canvasMenuLevel);
-        menuLevelHow.name = "MenuLevel";
     }
 }
 
@@ -162,11 +183,11 @@ public class DBMenuLevelsEditor : Editor
         _numberLevels.Clear();
 
         _dataMenuLevels = null;
-        string[] assetNames = AssetDatabase.FindAssets("", new[] {"Assets/Scripts/"});
+        string[] assetNames = AssetDatabase.FindAssets("", new[] {"Assets/UI/"});
         foreach (string SOName in assetNames)
         {
             var SOpath = AssetDatabase.GUIDToAssetPath(SOName);
-            _dataMenuLevels = AssetDatabase.LoadAssetAtPath<DBMenuLevels>(SOpath);
+            _dataMenuLevels = (DBMenuLevels) AssetDatabase.LoadAssetAtPath<ScriptableObject>(SOpath);;
         }
 
         GUILayout.Space(30f);
