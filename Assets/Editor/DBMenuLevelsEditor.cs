@@ -56,5 +56,10 @@ public class DBMenuLevelsEditor : Editor
         {
             _dataMenuLevels.CreateMenuLevel(_numberLevel);
         }
+        GUILayout.Space(5f);
+        if (GUILayout.Button("Обновить UI"))
+        {
+            _dataMenuLevels.RefreshMenuLevel(_numberLevel);
+        }
     }
 }

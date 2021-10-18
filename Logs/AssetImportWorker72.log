@@ -1,0 +1,42 @@
+Using pre-set license
+Built from '2020.3/staging' branch; Version is '2020.3.19f1 (68f137dc9bbe) revision 6877495'; Using compiler version '192528614'; Build Type 'Release'
+OS: 'Windows 10 Pro; OS build 19043.1288; Version 2009; 64bit' Language: 'ru' Physical Memory: 12245 MB
+BatchMode: 1, IsHumanControllingUs: 0, StartBugReporterOnCrash: 0, Is64bit: 1, IsPro: 0
+
+COMMAND LINE ARGUMENTS:
+C:\Program Files\Unity\Hub\Editor\2020.3.19f1\Editor\Unity.exe
+-adb2
+-batchMode
+-noUpm
+-name
+AssetImportWorker72
+-projectPath
+D:/unity/UIMainMenu
+-logFile
+Logs/AssetImportWorker72.log
+-srvPort
+55818
+Successfully changed project path to: D:/unity/UIMainMenu
+D:/unity/UIMainMenu
+Using Asset Import Pipeline V2.
+received signal from system: SIGSEGV
+Stack trace:
+0x00007ff7220a78dc (Unity) StackWalker::GetCurrentCallstack
+0x00007ff7220aff79 (Unity) StackWalker::ShowCallstack
+0x00007ff7235d3ddc (Unity) GetStacktrace
+0x00007ff7220a6f44 (Unity) winutils::CrashHandler::DefaultSignalHandler
+0x00007ff72548be72 (Unity) seh_filter_exe
+0x00007ff7258607a9 (Unity) `__scrt_common_main_seh'::`1'::filt$0
+0x00007ff725459a58 (Unity) _C_specific_handler
+0x00007ffbf0d920cf (ntdll) _chkstk
+0x00007ffbf0d41454 (ntdll) RtlRaiseException
+0x00007ffbf0d90bfe (ntdll) KiUserExceptionDispatcher
+0x00007ff72377b5ed (Unity) SyncAssetFoldersWithDB
+0x00007ff723762119 (Unity) InitializeAssetDatabaseV2
+0x00007ff7236b3ca5 (Unity) AssetDatabase::InitializeAssetDatabase
+0x00007ff722c343b0 (Unity) Application::InitializeProject
+0x00007ff7235e1342 (Unity) WinMain
+0x00007ff7254369b6 (Unity) __scrt_common_main_seh
+0x00007ffbeedd7034 (KERNEL32) BaseThreadInitThunk
+0x00007ffbf0d42651 (ntdll) RtlUserThreadStart
+

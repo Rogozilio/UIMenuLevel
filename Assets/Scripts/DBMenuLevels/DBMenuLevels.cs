@@ -55,10 +55,21 @@ public class DBMenuLevels : ScriptableObject
             if (canvasMenuLevel.name == "MenuLevel")
                 break;
         }
-
         GameObject menuLevelNow = Instantiate(canvasMenuLevel);
-        menuLevelNow.name = "MenuLevel";
+        SetMenuLevel(menuLevelNow, menuLevel);
+    }
 
+    public void RefreshMenuLevel(int index)
+    {
+        GameObject menuLevel = GameObject.Find(MenuLevels[index].name);
+        if (menuLevel != null)
+        {
+            SetMenuLevel(menuLevel, MenuLevels[index]); 
+        }
+    }
+
+    private void SetMenuLevel(GameObject menuLevelNow, DataMenuLevel menuLevel)
+    {
         foreach (var component in menuLevelNow.GetComponentsInChildren<Image>())
         {
             Color color = component.color;
@@ -116,6 +127,7 @@ public class DBMenuLevels : ScriptableObject
             switch (component.name)
             {
                 case "Name":
+                    menuLevelNow.name = menuLevel.name;
                     component.text = menuLevel.name;
                     component.font = menuLevel.fontName;
                     component.fontSize = menuLevel.sizeFontName;
